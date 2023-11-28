@@ -131,7 +131,7 @@ export default defineConfig({
     {
       requestLibPath: "import { request } from '@umijs/max'",
       schemaPath: 'http://localhost:8101/api/v2/api-docs',
-      projectName: 'Z-API_backend',
+      projectName: 'swagger',
     },
   ],
   mfsu: {

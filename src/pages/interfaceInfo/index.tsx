@@ -13,10 +13,13 @@ import {
 import '@umijs/max';
 import {Button, Drawer, Input, message} from 'antd';
 import React, {useRef, useState} from 'react';
-import type {FormValueType} from './components/UpdateForm';
-import UpdateForm from './components/UpdateForm';
+import type {FormValueType} from './components/UpdateModal';
+import UpdateModal from './components/UpdateModal';
 import CreateModal from "./components/CreateModel";
-import {listInterfaceInfoVOByPageUsingPOST} from "@/services/Z-API_backend/interfaceInfoController";
+import {
+  addInterfaceInfoUsingPOST,
+  listInterfaceInfoVOByPageUsingPOST, updateInterfaceInfoUsingPOST
+} from "@/services/Z-API_backend/interfaceInfoController";
 import {SortOrder} from "antd/lib/table/interface";
 
 /**
@@ -24,10 +27,10 @@ import {SortOrder} from "antd/lib/table/interface";
  * @zh-CN 添加节点
  * @param fields
  */
-const handleAdd = async (fields: API.RuleListItem) => {
+const handleAdd = async (fields: API.InterfaceInfoAddRequest) => {
   const hide = message.loading('正在添加');
   try {
-    await addRule({
+    await addInterfaceInfoUsingPOST({
       ...fields,
     });
     hide();
@@ -46,20 +49,21 @@ const handleAdd = async (fields: API.RuleListItem) => {
  *
  * @param fields
  */
-const handleUpdate = async (fields: FormValueType) => {
-  const hide = message.loading('Configuring');
+const handleUpdate = async (fields: API.InterfaceInfoVO) => {
+  //设置加载修改中
+  const hide = message.loading('修改中');
   try {
-    await updateRule({
-      name: fields.name,
-      desc: fields.desc,
-      key: fields.key,
+    //修改请求接口updateInterfaceInfoUsingPOST
+    await updateInterfaceInfoUsingPOST({
+      ...fields
     });
     hide();
-    message.success('Configuration is successful');
+    //如果调用成功显示操作成功
+    message.success('操作成功');
     return true;
-  } catch (error) {
+  } catch (error:any) {
     hide();
-    message.error('Configuration failed, please try again!');
+    message.error('操作失败,'+ error.message);
     return false;
   }
 };
@@ -107,7 +111,7 @@ const TableList: React.FC = () => {
    * @zh-CN 国际化配置
    * */
 
-  const columns: ProColumns<API.RuleListItem>[] = [
+  const columns: ProColumns<API.InterfaceInfoVO>[] = [
     {
       title: 'id',
       dataIndex: 'id',
@@ -117,6 +121,14 @@ const TableList: React.FC = () => {
       title: '接口名称',
       dataIndex: 'name',
       valueType: 'text',
+      formItemProps:{
+        rules: [
+          {
+            required: true,
+            message: '请输入接口名称！',
+          },
+        ],
+      }
     },
     {
       title: '描述',
@@ -160,8 +172,15 @@ const TableList: React.FC = () => {
     },
     {
       title: '创建时间',
+      dataIndex: 'createTime',
+      valueType: 'dateTime',
+      hideInForm: true,
+    },
+    {
+      title: '创建时间',
       dataIndex: 'updateTime',
       valueType: 'dateTime',
+      hideInForm:true,
     },
     {
       title: '操作',
@@ -175,10 +194,10 @@ const TableList: React.FC = () => {
             setCurrentRow(record);
           }}
         >
-          配置
+          修改
         </a>,
         <a key="subsribeAlert" href="https://procomponents.ant.design/">
-          订阅警报
+          删除
         </a>,
       ],
     }
@@ -261,7 +280,8 @@ const TableList: React.FC = () => {
         </FooterToolbar>
       )}
 
-      <UpdateForm
+      <UpdateModal
+        columns={columns}
         onSubmit={async (value) => {
           const success = await handleUpdate(value);
           if (success) {
@@ -278,7 +298,7 @@ const TableList: React.FC = () => {
             setCurrentRow(undefined);
           }
         }}
-        updateModalOpen={updateModalOpen}
+        visible={updateModalOpen}
         values={currentRow || {}}
       />
 
@@ -311,7 +331,7 @@ const TableList: React.FC = () => {
         onCancel={()=>{
           handleModalOpen(false);
         }}
-        onSubmit={(values)=>{
+        onSubmit = {(values)=>{
           handleAdd(values);
         }}
         visible={createModalOpen}

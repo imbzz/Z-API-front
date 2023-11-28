@@ -7,18 +7,14 @@ import '@umijs/max';
 import React from 'react';
 import { Modal } from 'antd';
 export type Props = {
-  columns: ProColumns<API.InterfaceInfoVO>[]
-  //当前用户点击取消触发
-  onCancel: () => void;
-  //当前用户提交表单触发，将用户输入的数据穿给后台
-  onSumbit: (values:API.InterfaceInfoVO) => Promise<void>;
-  //模态框是否可见
-  visible:boolean
-  //updateModalOpen:boolean
-  // values:Partial<API.RuleListItem>;
+  columns: ProColumns<API.InterfaceInfoVO>[],
+  onCancel: () => void,
+  onSubmit: (values: API.InterfaceInfoVO) => Promise<void>,
+  visible: boolean,
+
 }
 const CreateModal: React.FC<Props> = (props) => {
-  const {visible, onCancel, onSumbit,columns } = props;
+  const {visible, onCancel, onSubmit,columns } = props;
   return (
     <Modal visible={visible} footer={null} onCancel={()=>onCancel?.()}>
       {
@@ -26,7 +22,7 @@ const CreateModal: React.FC<Props> = (props) => {
           type="form"
           columns={columns}
           onSubmit={async(value)=>{
-            onSumbit?.(value);
+            onSubmit?.(value);
           }}
         />
       }
