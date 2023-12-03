@@ -20,7 +20,7 @@ import { Alert, message, Tabs } from 'antd';
 import React, { useState } from 'react';
 import { flushSync } from 'react-dom';
 import Settings from '../../../../config/defaultSettings';
-import {userLoginUsingPOST} from "@/services/Z-API_backend/userController";
+import {userLoginUsingPOST} from "@/services/swagger/userController";
 const ActionIcons = () => {
   const langClassName = useEmotionCss(({ token }) => {
     return {

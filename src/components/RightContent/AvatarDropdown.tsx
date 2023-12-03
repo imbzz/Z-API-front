@@ -8,7 +8,7 @@ import type { MenuInfo } from 'rc-menu/lib/interface';
 import React, { useCallback } from 'react';
 import { flushSync } from 'react-dom';
 import HeaderDropdown from '../HeaderDropdown';
-import {userLogoutUsingPOST} from "@/services/Z-API_backend/userController";
+import {userLogoutUsingPOST} from "@/services/swagger/userController";
 
 export type GlobalHeaderRightProps = {
   menu?: boolean;

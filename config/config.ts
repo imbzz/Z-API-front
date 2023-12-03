@@ -130,7 +130,7 @@ export default defineConfig({
 
     {
       requestLibPath: "import { request } from '@umijs/max'",
-      schemaPath: 'http://localhost:8101/api/v2/api-docs',
+      schemaPath: 'http://localhost:7529/api/v2/api-docs',
       projectName: 'swagger',
     },
   ],

@@ -1,15 +1,10 @@
 import {
-  ActionType,
   ProColumns,
-  ProFormDateTimePicker, ProFormInstance,
-  ProFormRadio,
-  ProFormSelect,
-  ProFormText,
-  ProFormTextArea, ProTable,
-  StepsForm,
+  ProFormInstance,
+  ProTable,
 } from '@ant-design/pro-components';
 import '@umijs/max';
-import { Modal } from 'antd';
+import {Modal} from 'antd';
 import React, {useEffect} from 'react';
 
 
@@ -46,8 +41,8 @@ const UpdateModal: React.FC<Props> = (props) => {
          type="form"
          formRef={formRef}
          columns={columns}
-         onSubmit={async (values)=>{
-           onSubmit?.(values);
+         onSubmit={async (value) => {
+           onSubmit?.(value);
          }}
        />
      }

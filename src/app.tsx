@@ -6,7 +6,7 @@ import type {RunTimeLayoutConfig} from '@umijs/max';
 import {history, Link} from '@umijs/max';
 import {AvatarDropdown, AvatarName} from './components/RightContent/AvatarDropdown';
 import {requestConfig} from './requestConfig';
-import {getLoginUserUsingGET} from "@/services/Z-API_backend/userController";
+import {getLoginUserUsingGET} from "@/services/swagger/userController";
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';

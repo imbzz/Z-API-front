@@ -1,95 +1,27 @@
-import {addRule, removeRule, rule, updateRule} from '@/services/ant-design-pro/api';
 import {PlusOutlined} from '@ant-design/icons';
 import type {ActionType, ProColumns, ProDescriptionsItemProps} from '@ant-design/pro-components';
 import {
   FooterToolbar,
-  ModalForm,
   PageContainer,
   ProDescriptions,
-  ProFormText,
-  ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
 import '@umijs/max';
-import {Button, Drawer, Input, message} from 'antd';
+import {Button, Drawer, message} from 'antd';
 import React, {useRef, useState} from 'react';
-import type {FormValueType} from './components/UpdateModal';
 import UpdateModal from './components/UpdateModal';
 import CreateModal from "./components/CreateModel";
 import {
   addInterfaceInfoUsingPOST,
-  listInterfaceInfoVOByPageUsingPOST, updateInterfaceInfoUsingPOST
-} from "@/services/Z-API_backend/interfaceInfoController";
+  deleteInterfaceInfoUsingPOST,
+  listInterfaceInfoVOByPageUsingPOST,
+  offLineInterfaceInfoUsingPOST,
+  onLineInterfaceInfoUsingPOST,
+  updateInterfaceInfoUsingPOST
+} from "@/services/swagger/interfaceInfoController";
 import {SortOrder} from "antd/lib/table/interface";
 
-/**
- * @en-US Add node
- * @zh-CN 添加节点
- * @param fields
- */
-const handleAdd = async (fields: API.InterfaceInfoAddRequest) => {
-  const hide = message.loading('正在添加');
-  try {
-    await addInterfaceInfoUsingPOST({
-      ...fields,
-    });
-    hide();
-    message.success('Added successfully');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Adding failed, please try again!');
-    return false;
-  }
-};
 
-/**
- * @en-US Update node
- * @zh-CN 更新节点
- *
- * @param fields
- */
-const handleUpdate = async (fields: API.InterfaceInfoVO) => {
-  //设置加载修改中
-  const hide = message.loading('修改中');
-  try {
-    //修改请求接口updateInterfaceInfoUsingPOST
-    await updateInterfaceInfoUsingPOST({
-      ...fields
-    });
-    hide();
-    //如果调用成功显示操作成功
-    message.success('操作成功');
-    return true;
-  } catch (error:any) {
-    hide();
-    message.error('操作失败,'+ error.message);
-    return false;
-  }
-};
-
-/**
- *  Delete node
- * @zh-CN 删除节点
- *
- * @param selectedRows
- */
-const handleRemove = async (selectedRows: API.RuleListItem[]) => {
-  const hide = message.loading('正在删除');
-  if (!selectedRows) return true;
-  try {
-    await removeRule({
-      key: selectedRows.map((row) => row.key),
-    });
-    hide();
-    message.success('Deleted successfully and will refresh soon');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Delete failed, please try again');
-    return false;
-  }
-};
 const TableList: React.FC = () => {
   /**
    * @en-US Pop-up window of new window
@@ -103,8 +35,139 @@ const TableList: React.FC = () => {
   const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
   const [showDetail, setShowDetail] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
+  const [currentRow, setCurrentRow] = useState<API.InterfaceInfoVO>();
+  const [selectedRowsState, setSelectedRows] = useState<API.InterfaceInfoVO[]>([]);
+  /**
+   * @en-US Add node
+   * @zh-CN 添加节点
+   * @param fields
+   */
+  const handleAdd = async (fields: API.InterfaceInfoAddRequest) => {
+    const hide = message.loading('正在添加');
+    try {
+      await addInterfaceInfoUsingPOST({
+        ...fields,
+      });
+      hide();
+      message.success('Added successfully');
+      return true;
+    } catch (error) {
+      hide();
+      message.error('Adding failed, please try again!');
+      return false;
+    }
+  };
+
+  /**
+   * @en-US Update node
+   * @zh-CN 更新节点
+   *
+   * @param fields
+   */
+  const handleUpdate = async (fields: API.InterfaceInfoUpdateRequest) => {
+    // 如果没有选中，则直接返回
+    if (!currentRow) return;
+    //设置加载修改中
+    const hide = message.loading('修改中');
+    try {
+      //修改请求接口updateInterfaceInfoUsingPOST
+      await updateInterfaceInfoUsingPOST({
+        id:currentRow.id,
+        ...fields
+      });
+      hide();
+      //如果调用成功显示操作成功
+      message.success('操作成功');
+      return true;
+    } catch (error:any) {
+      hide();
+      message.error('操作失败,'+ error.message);
+      return false;
+    }
+  };
+
+  /**
+   *  Delete node
+   * @zh-CN 删除节点
+   *
+   * @param selectedRows
+   */
+  const handleRemove = async (record: API.InterfaceInfoVO) => {
+    const hide = message.loading('正在删除');
+    if (!record) return true;
+    try {
+      //修改接口为deleteInterfaceInfoUsingPOST
+      await deleteInterfaceInfoUsingPOST({
+        id:record.id
+      });
+      hide();
+      //删除成功提示
+      message.success('删除成功');
+      //刷新页面
+      actionRef.current?.reload();
+      return true;
+    } catch (error) {
+      hide();
+      message.error('Delete failed, please try again');
+      return false;
+    }
+  };
+
+
+  /**
+   *  Delete node
+   * @zh-CN 发布接口
+   *
+   * @param selectedRows
+   */
+  const handleOnLine = async (record: API.IdRequest) => {
+    const hide = message.loading('发布中');
+    if (!record) return true;
+    try {
+      //修改接口为deleteInterfaceInfoUsingPOST
+      await onLineInterfaceInfoUsingPOST({
+        id:record.id
+      });
+      hide();
+      //删除成功提示
+      message.success('操作成功');
+      //刷新页面
+      actionRef.current?.reload();
+      return true;
+    } catch (error) {
+      hide();
+      message.error('操作失败');
+      return false;
+    }
+  };
+
+  /**
+   *  Delete node
+   * @zh-CN 发布接口
+   *
+   * @param selectedRows
+   */
+  const handleOffLine = async (record: API.IdRequest) => {
+    const hide = message.loading('关闭中');
+    if (!record) return true;
+    try {
+      //修改接口为deleteInterfaceInfoUsingPOST
+      await offLineInterfaceInfoUsingPOST({
+        id:record.id
+      });
+      hide();
+      //删除成功提示
+      message.success('操作成功');
+      //刷新页面
+      actionRef.current?.reload();
+      return true;
+    } catch (error) {
+      hide();
+      message.error('操作失败');
+      return false;
+    }
+  };
+
 
   /**
    * @en-US International configuration
@@ -188,7 +251,7 @@ const TableList: React.FC = () => {
       valueType: 'option',
       render: (_, record) => [
         <a
-          key="config"
+          key="update"
           onClick={() => {
             handleUpdateModalOpen(true);
             setCurrentRow(record);
@@ -196,9 +259,39 @@ const TableList: React.FC = () => {
         >
           修改
         </a>,
-        <a key="subsribeAlert" href="https://procomponents.ant.design/">
+
+
+        record.status === 0 ?
+        <a
+          key="onlien"
+          onClick={() => {
+            handleOnLine(record);
+          }}
+        >
+          发布
+        </a> : null,
+        record.status === 1 ?
+          <Button
+            type="text"
+            danger
+            key="offLine"
+            onClick={() => {
+            handleOffLine(record);
+          }}
+        >
+          下线
+        </Button>: null,
+        //删除
+        <Button
+          type="text"
+          danger
+          key="remove"
+          onClick={() => {
+            handleRemove(record);
+          }}
+        >
           删除
-        </a>,
+        </Button>,
       ],
     }
   ];
@@ -231,7 +324,7 @@ const TableList: React.FC = () => {
             return {
               data: res?.data.records || [],
               success: true,
-              total: res.total
+              total: res.data.total
             }
           }else{
             return {
@@ -281,8 +374,11 @@ const TableList: React.FC = () => {
       )}
 
       <UpdateModal
+        values={currentRow || {}}
         columns={columns}
         onSubmit={async (value) => {
+          console.log("更新的数据-------------------------")
+          console.log(value)
           const success = await handleUpdate(value);
           if (success) {
             handleUpdateModalOpen(false);
@@ -299,7 +395,7 @@ const TableList: React.FC = () => {
           }
         }}
         visible={updateModalOpen}
-        values={currentRow || {}}
+
       />
 
       <Drawer
