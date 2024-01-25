@@ -1,7 +1,9 @@
 <<<<<<< HEAD
+
 # Z-API-front
-Z-API前端
-=======
+
+# Z-API 前端修复
+
 # Ant Design Pro
 
 This project is initialized with [Ant Design Pro](https://pro.ant.design). Follow is the quick guide for how to use.
@@ -59,4 +61,5 @@ npm test
 ## More
 
 You can view full document on our [official website](https://pro.ant.design). And welcome any feedback in our [github](https://github.com/ant-design/ant-design-pro).
->>>>>>> 24ee970 (初始化项目 添加接口弹窗)
+
+> > > > > > > 24ee970 (初始化项目 添加接口弹窗)
