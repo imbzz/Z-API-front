@@ -1,45 +1,67 @@
+import { listTopInvokeInterfaceInfoUsingGET } from '@/services/swagger/analysisController';
 import { PageContainer } from '@ant-design/pro-components';
-import { Chart } from '@antv/g2';
 import '@umijs/max';
-import React from 'react';
+import ReactECharts from 'echarts-for-react';
+import React, { useEffect, useState } from 'react';
 
+/**
+ * 接口分析
+ * @constructor
+ */
 const InterfaceAnalysis: React.FC = () => {
-  const data = [
-    { item: '事例一', count: 40, percent: 0.4 },
-    { item: '事例二', count: 21, percent: 0.21 },
-    { item: '事例三', count: 17, percent: 0.17 },
-    { item: '事例四', count: 13, percent: 0.13 },
-    { item: '事例五', count: 9, percent: 0.09 },
-  ];
+  const [data, setData] = useState<API.InterfaceInfoVO[]>([]);
 
-  const chart = new Chart({
-    container: 'container',
-    autoFit: true,
+  useEffect(() => {
+    try {
+      listTopInvokeInterfaceInfoUsingGET().then((res) => {
+        if (res.data) {
+          setData(res.data);
+        }
+      });
+    } catch (e: any) {}
+    // todo 从远程获取数据
+  }, []);
+
+  // 映射：{ value: 1048, name: 'Search Engine' },
+  const chartData = data.map((item) => {
+    return {
+      value: item.totalNum,
+      name: item.name,
+    };
   });
 
-  chart.coordinate({ type: 'theta', outerRadius: 0.8 });
-
-  chart
-    .interval()
-    .data(data)
-    .transform({ type: 'stackY' })
-    .encode('y', 'percent')
-    .encode('color', 'item')
-    .legend('color', { position: 'bottom', layout: { justifyContent: 'center' } })
-    .label({
-      position: 'outside',
-      text: (data) => `${data.item}: ${data.percent * 100}%`,
-    })
-    .tooltip((data) => ({
-      name: data.item,
-      value: `${data.percent * 100}%`,
-    }));
-
-  chart.render();
+  const option = {
+    title: {
+      text: '调用次数最多的接口TOP3',
+      left: 'center',
+    },
+    tooltip: {
+      trigger: 'item',
+    },
+    legend: {
+      orient: 'vertical',
+      left: 'left',
+    },
+    series: [
+      {
+        name: 'Access From',
+        type: 'pie',
+        radius: '50%',
+        data: chartData,
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0, 0, 0, 0.5)',
+          },
+        },
+      },
+    ],
+  };
 
   return (
     <PageContainer>
-      <div id="container"></div>
+      <ReactECharts option={option} />
     </PageContainer>
   );
 };
